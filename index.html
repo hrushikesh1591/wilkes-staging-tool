@@ -1,46 +1,110 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wilkes Staging Tool - Full Form</title>
-  <link rel="manifest" href="manifest.json">
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wilkes Staging Tool</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
-    h2, h3 { color: #2c3e50; }
-    .section { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
-    .question { margin-bottom: 15px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; }
-    select, input[type="radio"], input[type="checkbox"] { margin-right: 10px; }
-    button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-    button:hover { background-color: #2980b9; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      color: #005f99;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h3 {
+      color: #007acc;
+      border-bottom: 2px solid #007acc;
+      padding-bottom: 5px;
+    }
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-left: 5px solid #007acc;
+      background-color: #ffffff;
+      border-radius: 8px;
+    }
+    .question {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input,
+    select {
+      padding: 8px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: auto;
+      margin-right: 8px;
+    }
+    button {
+      background-color: #007acc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005f99;
+    }
+    #results {
+      background-color: #e6f2ff;
+    }
   </style>
 </head>
 <body>
-  <h2>Wilkes Staging Tool - Clinical, Radiologic & Surgical Findings</h2>
-  <form id="wilkesForm" onsubmit="event.preventDefault(); evaluateCombinedStage();">
-    <h3>Section I: Clinical Findings</h3>
+  <h2>Wilkes Staging Tool - TMJ Internal Derangement</h2>
+  <form id="wilkesForm" onsubmit="event.preventDefault(); evaluateStages();">
     <div class="section">
-      <div class="question"><label><input type="checkbox" name="reciprocalClick"> Presence of Reciprocal Clicking</label></div>
+      <h3>Patient Information</h3>
+      <div class="question"><label>Patient Name:<input type="text" name="patientName" required /></label></div>
+      <div class="question"><label>Age:<input type="text" name="age" required /></label></div>
+      <div class="question"><label>Gender:<input type="text" name="gender" required /></label></div>
+      <div class="question"><label>Date of Exam:<input type="date" name="examDate" required /></label></div>
+      <div class="question">
+        <label>Evaluation Time Point:</label>
+        <label><input type="checkbox" name="timepoint" value="Preop" /> Preop</label>
+        <label><input type="checkbox" name="timepoint" value="POD 7" /> POD 7</label>
+        <label><input type="checkbox" name="timepoint" value="PO 1 Month" /> PO 1 Month</label>
+        <label><input type="checkbox" name="timepoint" value="PO 3 Months" /> PO 3 Months</label>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Clinical Findings</h3>
+      <div class="question">
+        <label><input type="checkbox" name="reciprocalClick" /> Presence of Reciprocal Clicking</label>
+      </div>
       <div class="question">
         <label>Clicking Timing:</label>
         <select name="clickingTiming">
-          <option value="">--Select--</option>
-          <option value="early">Early opening</option>
-          <option value="late">Late closing</option>
-          <option value="later">Later in opening</option>
+          <option value="">Select</option>
+          <option value="early">Early opening movement</option>
+          <option value="late">Late closing movement</option>
+          <option value="later">Later in opening movement</option>
         </select>
       </div>
       <div class="question">
         <label>Clicking Intensity:</label>
         <select name="clickingIntensity">
-          <option value="">--Select--</option>
+          <option value="">Select</option>
           <option value="soft">Soft</option>
           <option value="increased">Increased</option>
         </select>
@@ -48,175 +112,187 @@
       <div class="question">
         <label>Pain Presence:</label>
         <select name="painPresence">
-          <option value="">--Select--</option>
+          <option value="">Select</option>
           <option value="none">No pain</option>
-          <option value="few">First few episodes</option>
+          <option value="few">First few episodes of pain</option>
           <option value="multiple">Multiple episodes</option>
-          <option value="chronic">Chronic/episodic</option>
-        </select>
-      </div>
-      <div class="question">
-        <label>Joint Tenderness:</label>
-        <select name="jointTenderness">
-          <option value="">--Select--</option>
-          <option value="occasional">Occasional</option>
-          <option value="present">Present</option>
-        </select>
-      </div>
-      <div class="question">
-        <label>Temporal Headaches:</label>
-        <select name="temporalHeadaches">
-          <option value="">--Select--</option>
-          <option value="occasional">Occasional</option>
-          <option value="present">Present</option>
-        </select>
-      </div>
-      <div class="question">
-        <label>Mechanical Symptoms:</label>
-        <select name="mechanicalSymptoms">
-          <option value="">--Select--</option>
-          <option value="beginning">Beginning transient subluxation</option>
-          <option value="transient">Transient locking/catching</option>
+          <option value="chronic">Chronic/episodic pain</option>
         </select>
       </div>
       <div class="question">
         <label>Limitation of Motion:</label>
         <select name="limitationMotion">
-          <option value="">--Select--</option>
-          <option value="none">No</option>
+          <option value="">Select</option>
+          <option value="none">No limitation</option>
           <option value="restriction">Restriction</option>
           <option value="variable">Variable restriction</option>
           <option value="chronic">Chronic restriction</option>
         </select>
       </div>
-      <div class="question"><label><input type="checkbox" name="difficultyFunction"> Difficulty with Function</label></div>
-      <div class="question"><label><input type="checkbox" name="undulatingCourse"> Undulating Course</label></div>
-      <div class="question"><label><input type="checkbox" name="crepitus"> Crepitus</label></div>
-      <div class="question"><label><input type="checkbox" name="scraping"> Scraping/Grating/Grinding</label></div>
+      <div class="question">
+        <label><input type="checkbox" name="crepitus" /> Crepitus on Examination</label>
+      </div>
     </div>
 
-    <h3>Section II: Radiologic Findings</h3>
     <div class="section">
+      <h3>Radiologic Findings</h3>
       <div class="question">
         <label>Disk Displacement:</label>
         <select name="diskDisplacement">
-          <option value="">--Select--</option>
-          <option value="slightForward">Slight forward</option>
-          <option value="anterior">Anterior</option>
+          <option value="">Select</option>
+          <option value="slightForward">Slight forward displacement</option>
+          <option value="anterior">Anterior displacement</option>
         </select>
       </div>
       <div class="question">
         <label>Disk Morphology:</label>
         <select name="diskMorphology">
-          <option value="">--Select--</option>
-          <option value="good">Good</option>
-          <option value="slight">Slight deformity</option>
+          <option value="">Select</option>
+          <option value="good">Good anatomical contour</option>
+          <option value="moderate">Moderate to marked thickening</option>
           <option value="significant">Significant deformity</option>
-          <option value="moderate">Moderate thickening</option>
-          <option value="gross">Gross deformity</option>
+          <option value="gross">Gross anatomical deformity</option>
         </select>
       </div>
       <div class="question">
-        <label>Tomogram Findings:</label>
-        <select name="tomogram">
-          <option value="">--Select--</option>
-          <option value="normal">Normal</option>
-          <option value="abnormal">Abnormal</option>
-        </select>
-      </div>
-      <div class="question">
-        <label>Hard-tissue Changes:</label>
+        <label>Hard-Tissue Changes:</label>
         <select name="hardTissueChanges">
-          <option value="">--Select--</option>
-          <option value="early">Early to moderate</option>
-          <option value="advanced">Degenerative arthritis</option>
+          <option value="">Select</option>
+          <option value="early">Early to moderate degenerative</option>
+          <option value="advanced">Degenerative arthritic changes</option>
         </select>
       </div>
-      <div class="question"><label><input type="checkbox" name="perforation"> Perforation (Upper + Lower compartments)</label></div>
-      <div class="question"><label><input type="checkbox" name="fillingDefects"> Filling Defects</label></div>
     </div>
 
-    <h3>Section III: Surgical Findings</h3>
     <div class="section">
+      <h3>Surgical Findings</h3>
       <div class="question">
-        <label>Disk Anatomical Form:</label>
+        <label>Disk Form (Surgical):</label>
         <select name="diskSurgicalForm">
-          <option value="">--Select--</option>
+          <option value="">Select</option>
           <option value="normal">Normal</option>
-          <option value="slight">Slight displacement</option>
-          <option value="anterior">Anterior</option>
-          <option value="early">Early deformity</option>
-          <option value="central">Well-defined central area</option>
           <option value="marked">Marked deformity</option>
           <option value="gross">Gross degenerative changes</option>
         </select>
       </div>
-      <div class="question"><label><input type="checkbox" name="passiveIncoordination"> Passive Incoordination</label></div>
-      <div class="question">
-        <label>Hard-tissue Changes (Surgical):</label>
-        <select name="surgicalHardTissue">
-          <option value="">--Select--</option>
-          <option value="none">None</option>
-          <option value="remodeling">Degenerative remodeling</option>
-          <option value="erosions">Erosions</option>
-          <option value="sclerosis">Sclerosis</option>
-          <option value="flattening">Flattening</option>
-          <option value="anvil">Anvil-shaped condyle</option>
-          <option value="cystic">Subcortical cyst</option>
-        </select>
-      </div>
-      <div class="question"><label><input type="checkbox" name="osteophytes"> Osteophytic Projections</label></div>
       <div class="question">
         <label>Adhesions:</label>
         <select name="adhesions">
-          <option value="">--Select--</option>
-          <option value="variable">Variable</option>
+          <option value="">Select</option>
           <option value="multiple">Multiple</option>
-          <option value="degenerative">Degenerative arthritis equivalent</option>
+          <option value="degenerative">Degenerative equivalent</option>
         </select>
       </div>
       <div class="question">
-        <label>Disk/Attachment Perforation:</label>
+        <label><input type="checkbox" name="osteophytes" /> Osteophytic Projections</label>
+      </div>
+      <div class="question">
+        <label>Disk Perforation:</label>
         <select name="diskPerforation">
-          <option value="">--Select--</option>
-          <option value="none">None</option>
-          <option value="present">Posterior attachment perforation</option>
+          <option value="">Select</option>
+          <option value="none">No perforation</option>
+          <option value="present">Present</option>
         </select>
       </div>
     </div>
 
-    <button type="submit">Evaluate Wilkes Stage</button>
+    <div class="section">
+      <button type="submit">Evaluate Wilkes Stage</button>
+      <button type="button" onclick="downloadPDF()">Download Result as PDF</button>
+    </div>
   </form>
-  <div class="section"><h3 id="result">Result will be shown here</h3></div>
+
+  <div class="section" id="results">
+    <h3 id="clinicalResult">Clinical Staging: </h3>
+    <h3 id="radiologicResult">Radiologic Staging: </h3>
+    <h3 id="surgicalResult">Surgical Staging: </h3>
+  </div>
+
   <script>
-    function evaluateCombinedStage() {
+    function evaluateStages() {
       const form = document.forms['wilkesForm'];
-      const displacement = form['diskDisplacement'].value;
-      const morphology = form['diskMorphology'].value;
-      const hardTissue = form['hardTissueChanges'].value;
-      const surgicalForm = form['diskSurgicalForm'].value;
-      const adhesions = form['adhesions'].value;
-      const osteophytes = form['osteophytes'].checked;
-      const diskPerforation = form['diskPerforation'].value;
 
-      let stage = 'Cannot determine stage';
+      let clinicalStage = '';
+      let radiologicStage = '';
+      let surgicalStage = '';
 
-      if (displacement === 'slightForward' && morphology === 'good' && hardTissue === 'early') {
-        stage = 'Wilkes Stage I or II';
-      } else if (morphology === 'significant' || morphology === 'moderate') {
-        stage = 'Wilkes Stage III or IV';
-      } else if (
-        hardTissue === 'advanced' ||
-        morphology === 'gross' ||
-        surgicalForm === 'gross' ||
-        osteophytes ||
-        diskPerforation === 'present' ||
-        adhesions === 'degenerative'
-      ) {
-        stage = 'Wilkes Stage V';
+      const reciprocalClick = form['reciprocalClick']?.checked;
+      const painPresence = form['painPresence']?.value;
+      const limitationMotion = form['limitationMotion']?.value;
+      const crepitus = form['crepitus']?.checked;
+
+      if (reciprocalClick && painPresence === 'few' && limitationMotion === 'none') {
+        clinicalStage = 'Wilkes Stage I or II';
+      } else if (crepitus || painPresence === 'multiple' || limitationMotion === 'restriction') {
+        clinicalStage = 'Wilkes Stage III or IV';
+      } else if (limitationMotion === 'chronic') {
+        clinicalStage = 'Wilkes Stage V';
       }
 
-      document.getElementById('result').innerText = `Likely Wilkes Stage: ${stage}`;
+      const displacement = form['diskDisplacement']?.value;
+      const morphology = form['diskMorphology']?.value;
+      const hardTissue = form['hardTissueChanges']?.value;
+
+      if (displacement && morphology && hardTissue) {
+        if (displacement === 'slightForward' && morphology === 'good' && hardTissue === 'early') {
+          radiologicStage = 'Wilkes Stage I or II';
+        } else if (morphology === 'significant' || morphology === 'moderate') {
+          radiologicStage = 'Wilkes Stage III or IV';
+        } else if (hardTissue === 'advanced' || morphology === 'gross') {
+          radiologicStage = 'Wilkes Stage V';
+        }
+      }
+
+      const surgicalForm = form['diskSurgicalForm']?.value;
+      const adhesions = form['adhesions']?.value;
+      const osteophytes = form['osteophytes']?.checked;
+      const diskPerforation = form['diskPerforation']?.value;
+
+      if (surgicalForm || adhesions || osteophytes || diskPerforation) {
+        if (surgicalForm === 'normal' && !osteophytes && diskPerforation === 'none') {
+          surgicalStage = 'Wilkes Stage I or II';
+        } else if (surgicalForm === 'marked' || adhesions === 'multiple') {
+          surgicalStage = 'Wilkes Stage III or IV';
+        } else if (
+          surgicalForm === 'gross' ||
+          diskPerforation === 'present' ||
+          osteophytes ||
+          adhesions === 'degenerative'
+        ) {
+          surgicalStage = 'Wilkes Stage V';
+        }
+      }
+
+      document.getElementById('clinicalResult').innerText = 'Clinical Staging: ' + (clinicalStage || 'Insufficient data');
+      document.getElementById('radiologicResult').innerText = 'Radiologic Staging: ' + (radiologicStage || 'Insufficient data');
+      document.getElementById('surgicalResult').innerText = 'Surgical Staging: ' + (surgicalStage || 'Insufficient data');
+    }
+
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const form = document.forms['wilkesForm'];
+
+      const name = form['patientName']?.value || '';
+      const age = form['age']?.value || '';
+      const gender = form['gender']?.value || '';
+      const date = form['examDate']?.value || '';
+
+      const checkboxes = form.querySelectorAll('input[name="timepoint"]:checked');
+      const timepoints = Array.from(checkboxes).map(cb => cb.value).join(', ');
+
+      doc.setFontSize(12);
+      doc.text(`Patient Name: ${name}`, 10, 20);
+      doc.text(`Age: ${age}`, 10, 30);
+      doc.text(`Gender: ${gender}`, 10, 40);
+      doc.text(`Date of Exam: ${date}`, 10, 50);
+      doc.text(`Evaluation Time Point: ${timepoints}`, 10, 60);
+
+      doc.text(document.getElementById('clinicalResult').innerText, 10, 80);
+      doc.text(document.getElementById('radiologicResult').innerText, 10, 90);
+      doc.text(document.getElementById('surgicalResult').innerText, 10, 100);
+
+      doc.save(`${name || 'Wilkes_Staging'}_Result.pdf`);
     }
   </script>
 </body>
