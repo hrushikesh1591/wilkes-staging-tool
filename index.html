@@ -199,7 +199,7 @@
 
     <div class="section">
       <button type="submit">Evaluate Wilkes Stage</button>
-      <button type="button" onclick="downloadPDF()">Download Result as PDF</button>
+      <button type="button" onclick="evaluateStages(); downloadPDF();">Download Result as PDF</button>
     </div>
   </form>
 
@@ -269,13 +269,15 @@
       document.getElementById('surgicalResult').innerText = 'Surgical Staging: ' + (surgicalStage || 'Insufficient data');
     }
 
-    window.jsPDF = window.jspdf.jsPDF;
+    function downloadPDF() {
+      // Use the correct global object for jsPDF
+      if (!(window.jspdf && window.jspdf.jsPDF)) {
+        alert("jsPDF not loaded. Please check your internet connection.");
+        return;
+      }
+      const doc = new window.jspdf.jsPDF();
 
-    async function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
       const form = document.forms['wilkesForm'];
-
       const name = form['patientName']?.value || '';
       const age = form['age']?.value || '';
       const gender = form['gender']?.value || '';
@@ -284,6 +286,11 @@
       const checkboxes = form.querySelectorAll('input[name="timepoint"]:checked');
       const timepoints = Array.from(checkboxes).map(cb => cb.value).join(', ');
 
+      // Get the results texts
+      const clinicalResult = document.getElementById('clinicalResult').innerText;
+      const radiologicResult = document.getElementById('radiologicResult').innerText;
+      const surgicalResult = document.getElementById('surgicalResult').innerText;
+
       doc.setFontSize(12);
       doc.text(`Patient Name: ${name}`, 10, 20);
       doc.text(`Age: ${age}`, 10, 30);
@@ -291,9 +298,9 @@
       doc.text(`Date of Exam: ${date}`, 10, 50);
       doc.text(`Evaluation Time Point: ${timepoints}`, 10, 60);
 
-      doc.text(document.getElementById('clinicalResult').innerText, 10, 80);
-      doc.text(document.getElementById('radiologicResult').innerText, 10, 90);
-      doc.text(document.getElementById('surgicalResult').innerText, 10, 100);
+      doc.text(clinicalResult, 10, 80);
+      doc.text(radiologicResult, 10, 90);
+      doc.text(surgicalResult, 10, 100);
 
       doc.save(`${name || 'Wilkes_Staging'}_Result.pdf`);
     }
