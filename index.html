@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,12 +25,169 @@
 <body>
   <h2>Wilkes Staging Tool - Clinical, Radiologic & Surgical Findings</h2>
   <form id="wilkesForm" onsubmit="event.preventDefault(); evaluateCombinedStage();">
-    <!-- FORM CONTENT OMITTED FOR BREVITY, ADD YOUR FINAL FORM HTML HERE -->
+    <h3>Section I: Clinical Findings</h3>
+    <div class="section">
+      <div class="question"><label><input type="checkbox" name="reciprocalClick"> Presence of Reciprocal Clicking</label></div>
+      <div class="question">
+        <label>Clicking Timing:</label>
+        <select name="clickingTiming">
+          <option value="">--Select--</option>
+          <option value="early">Early opening</option>
+          <option value="late">Late closing</option>
+          <option value="later">Later in opening</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Clicking Intensity:</label>
+        <select name="clickingIntensity">
+          <option value="">--Select--</option>
+          <option value="soft">Soft</option>
+          <option value="increased">Increased</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Pain Presence:</label>
+        <select name="painPresence">
+          <option value="">--Select--</option>
+          <option value="none">No pain</option>
+          <option value="few">First few episodes</option>
+          <option value="multiple">Multiple episodes</option>
+          <option value="chronic">Chronic/episodic</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Joint Tenderness:</label>
+        <select name="jointTenderness">
+          <option value="">--Select--</option>
+          <option value="occasional">Occasional</option>
+          <option value="present">Present</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Temporal Headaches:</label>
+        <select name="temporalHeadaches">
+          <option value="">--Select--</option>
+          <option value="occasional">Occasional</option>
+          <option value="present">Present</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Mechanical Symptoms:</label>
+        <select name="mechanicalSymptoms">
+          <option value="">--Select--</option>
+          <option value="beginning">Beginning transient subluxation</option>
+          <option value="transient">Transient locking/catching</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Limitation of Motion:</label>
+        <select name="limitationMotion">
+          <option value="">--Select--</option>
+          <option value="none">No</option>
+          <option value="restriction">Restriction</option>
+          <option value="variable">Variable restriction</option>
+          <option value="chronic">Chronic restriction</option>
+        </select>
+      </div>
+      <div class="question"><label><input type="checkbox" name="difficultyFunction"> Difficulty with Function</label></div>
+      <div class="question"><label><input type="checkbox" name="undulatingCourse"> Undulating Course</label></div>
+      <div class="question"><label><input type="checkbox" name="crepitus"> Crepitus</label></div>
+      <div class="question"><label><input type="checkbox" name="scraping"> Scraping/Grating/Grinding</label></div>
+    </div>
+
+    <h3>Section II: Radiologic Findings</h3>
+    <div class="section">
+      <div class="question">
+        <label>Disk Displacement:</label>
+        <select name="diskDisplacement">
+          <option value="">--Select--</option>
+          <option value="slightForward">Slight forward</option>
+          <option value="anterior">Anterior</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Disk Morphology:</label>
+        <select name="diskMorphology">
+          <option value="">--Select--</option>
+          <option value="good">Good</option>
+          <option value="slight">Slight deformity</option>
+          <option value="significant">Significant deformity</option>
+          <option value="moderate">Moderate thickening</option>
+          <option value="gross">Gross deformity</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Tomogram Findings:</label>
+        <select name="tomogram">
+          <option value="">--Select--</option>
+          <option value="normal">Normal</option>
+          <option value="abnormal">Abnormal</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Hard-tissue Changes:</label>
+        <select name="hardTissueChanges">
+          <option value="">--Select--</option>
+          <option value="early">Early to moderate</option>
+          <option value="advanced">Degenerative arthritis</option>
+        </select>
+      </div>
+      <div class="question"><label><input type="checkbox" name="perforation"> Perforation (Upper + Lower compartments)</label></div>
+      <div class="question"><label><input type="checkbox" name="fillingDefects"> Filling Defects</label></div>
+    </div>
+
+    <h3>Section III: Surgical Findings</h3>
+    <div class="section">
+      <div class="question">
+        <label>Disk Anatomical Form:</label>
+        <select name="diskSurgicalForm">
+          <option value="">--Select--</option>
+          <option value="normal">Normal</option>
+          <option value="slight">Slight displacement</option>
+          <option value="anterior">Anterior</option>
+          <option value="early">Early deformity</option>
+          <option value="central">Well-defined central area</option>
+          <option value="marked">Marked deformity</option>
+          <option value="gross">Gross degenerative changes</option>
+        </select>
+      </div>
+      <div class="question"><label><input type="checkbox" name="passiveIncoordination"> Passive Incoordination</label></div>
+      <div class="question">
+        <label>Hard-tissue Changes (Surgical):</label>
+        <select name="surgicalHardTissue">
+          <option value="">--Select--</option>
+          <option value="none">None</option>
+          <option value="remodeling">Degenerative remodeling</option>
+          <option value="erosions">Erosions</option>
+          <option value="sclerosis">Sclerosis</option>
+          <option value="flattening">Flattening</option>
+          <option value="anvil">Anvil-shaped condyle</option>
+          <option value="cystic">Subcortical cyst</option>
+        </select>
+      </div>
+      <div class="question"><label><input type="checkbox" name="osteophytes"> Osteophytic Projections</label></div>
+      <div class="question">
+        <label>Adhesions:</label>
+        <select name="adhesions">
+          <option value="">--Select--</option>
+          <option value="variable">Variable</option>
+          <option value="multiple">Multiple</option>
+          <option value="degenerative">Degenerative arthritis equivalent</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Disk/Attachment Perforation:</label>
+        <select name="diskPerforation">
+          <option value="">--Select--</option>
+          <option value="none">None</option>
+          <option value="present">Posterior attachment perforation</option>
+        </select>
+      </div>
+    </div>
+
     <button type="submit">Evaluate Wilkes Stage</button>
   </form>
-  <div class="section">
-    <h3 id="result">Result will be shown here</h3>
-  </div>
+  <div class="section"><h3 id="result">Result will be shown here</h3></div>
   <script>
     function evaluateCombinedStage() {
       const form = document.forms['wilkesForm'];
