@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wilkes Staging Tool - Full Form</title>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    h2, h3 { color: #2c3e50; }
+    .section { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+    .question { margin-bottom: 15px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    select, input[type="radio"], input[type="checkbox"] { margin-right: 10px; }
+    button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #2980b9; }
+  </style>
+</head>
+<body>
+  <h2>Wilkes Staging Tool - Clinical, Radiologic & Surgical Findings</h2>
+  <form id="wilkesForm" onsubmit="event.preventDefault(); evaluateCombinedStage();">
+    <!-- FORM CONTENT OMITTED FOR BREVITY, ADD YOUR FINAL FORM HTML HERE -->
+    <button type="submit">Evaluate Wilkes Stage</button>
+  </form>
+  <div class="section">
+    <h3 id="result">Result will be shown here</h3>
+  </div>
+  <script>
+    function evaluateCombinedStage() {
+      const form = document.forms['wilkesForm'];
+      const displacement = form['diskDisplacement'].value;
+      const morphology = form['diskMorphology'].value;
+      const hardTissue = form['hardTissueChanges'].value;
+      const surgicalForm = form['diskSurgicalForm'].value;
+      const adhesions = form['adhesions'].value;
+      const osteophytes = form['osteophytes'].checked;
+      const diskPerforation = form['diskPerforation'].value;
+
+      let stage = 'Cannot determine stage';
+
+      if (displacement === 'slightForward' && morphology === 'good' && hardTissue === 'early') {
+        stage = 'Wilkes Stage I or II';
+      } else if (morphology === 'significant' || morphology === 'moderate') {
+        stage = 'Wilkes Stage III or IV';
+      } else if (
+        hardTissue === 'advanced' ||
+        morphology === 'gross' ||
+        surgicalForm === 'gross' ||
+        osteophytes ||
+        diskPerforation === 'present' ||
+        adhesions === 'degenerative'
+      ) {
+        stage = 'Wilkes Stage V';
+      }
+
+      document.getElementById('result').innerText = `Likely Wilkes Stage: ${stage}`;
+    }
+  </script>
+</body>
+</html>
