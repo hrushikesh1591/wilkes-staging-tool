@@ -267,7 +267,9 @@
       document.getElementById('radiologicResult').innerText = 'Radiologic Staging: ' + (radiologicStage || 'Insufficient data');
       document.getElementById('surgicalResult').innerText = 'Surgical Staging: ' + (surgicalStage || 'Insufficient data');
     }
-
+    
+window.jsPDF = window.jspdf.jsPDF;
+    
     async function downloadPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
