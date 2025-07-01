@@ -268,42 +268,81 @@
       document.getElementById('radiologicResult').innerText = 'Radiologic Staging: ' + (radiologicStage || 'Insufficient data');
       document.getElementById('surgicalResult').innerText = 'Surgical Staging: ' + (surgicalStage || 'Insufficient data');
     }
+    
+function downloadPDF() {
+  if (!(window.jspdf && window.jspdf.jsPDF)) {
+    alert("jsPDF not loaded. Please check your internet connection.");
+    return;
+  }
+  const doc = new window.jspdf.jsPDF();
+  const form = document.forms['wilkesForm'];
+  let y = 20;
 
-    function downloadPDF() {
-      // Use the correct global object for jsPDF
-      if (!(window.jspdf && window.jspdf.jsPDF)) {
-        alert("jsPDF not loaded. Please check your internet connection.");
-        return;
-      }
-      const doc = new window.jspdf.jsPDF();
+  // Patient Information
+  const name = form['patientName']?.value || '';
+  const age = form['age']?.value || '';
+  const gender = form['gender']?.value || '';
+  const date = form['examDate']?.value || '';
+  const checkboxes = form.querySelectorAll('input[name="timepoint"]:checked');
+  const timepoints = Array.from(checkboxes).map(cb => cb.value).join(', ');
+  doc.setFontSize(12);
+  doc.text(`Patient Information:`, 10, y);
+  doc.text(`Name: ${name}`, 10, y += 10);
+  doc.text(`Age: ${age}`, 10, y += 10);
+  doc.text(`Gender: ${gender}`, 10, y += 10);
+  doc.text(`Date of Exam: ${date}`, 10, y += 10);
+  doc.text(`Evaluation Time Point: ${timepoints}`, 10, y += 10);
 
-      const form = document.forms['wilkesForm'];
-      const name = form['patientName']?.value || '';
-      const age = form['age']?.value || '';
-      const gender = form['gender']?.value || '';
-      const date = form['examDate']?.value || '';
+  // Clinical Findings
+  const reciprocalClick = form['reciprocalClick']?.checked ? 'Yes' : 'No';
+  const clickingTiming = form['clickingTiming']?.value || '';
+  const clickingIntensity = form['clickingIntensity']?.value || '';
+  const painPresence = form['painPresence']?.value || '';
+  const limitationMotion = form['limitationMotion']?.value || '';
+  const crepitus = form['crepitus']?.checked ? 'Yes' : 'No';
+  doc.text(``, 10, y += 10);
+  doc.text(`Clinical Findings:`, 10, y += 10);
+  doc.text(`Reciprocal Click: ${reciprocalClick}`, 10, y += 10);
+  doc.text(`Clicking Timing: ${clickingTiming}`, 10, y += 10);
+  doc.text(`Clicking Intensity: ${clickingIntensity}`, 10, y += 10);
+  doc.text(`Pain Presence: ${painPresence}`, 10, y += 10);
+  doc.text(`Limitation of Motion: ${limitationMotion}`, 10, y += 10);
+  doc.text(`Crepitus: ${crepitus}`, 10, y += 10);
 
-      const checkboxes = form.querySelectorAll('input[name="timepoint"]:checked');
-      const timepoints = Array.from(checkboxes).map(cb => cb.value).join(', ');
+  // Radiologic Findings
+  const diskDisplacement = form['diskDisplacement']?.value || '';
+  const diskMorphology = form['diskMorphology']?.value || '';
+  const hardTissueChanges = form['hardTissueChanges']?.value || '';
+  doc.text(``, 10, y += 10);
+  doc.text(`Radiologic Findings:`, 10, y += 10);
+  doc.text(`Disk Displacement: ${diskDisplacement}`, 10, y += 10);
+  doc.text(`Disk Morphology: ${diskMorphology}`, 10, y += 10);
+  doc.text(`Hard-Tissue Changes: ${hardTissueChanges}`, 10, y += 10);
 
-      // Get the results texts
-      const clinicalResult = document.getElementById('clinicalResult').innerText;
-      const radiologicResult = document.getElementById('radiologicResult').innerText;
-      const surgicalResult = document.getElementById('surgicalResult').innerText;
+  // Surgical Findings
+  const diskSurgicalForm = form['diskSurgicalForm']?.value || '';
+  const adhesions = form['adhesions']?.value || '';
+  const osteophytes = form['osteophytes']?.checked ? 'Yes' : 'No';
+  const diskPerforation = form['diskPerforation']?.value || '';
+  doc.text(``, 10, y += 10);
+  doc.text(`Surgical Findings:`, 10, y += 10);
+  doc.text(`Disk Form (Surgical): ${diskSurgicalForm}`, 10, y += 10);
+  doc.text(`Adhesions: ${adhesions}`, 10, y += 10);
+  doc.text(`Osteophytic Projections: ${osteophytes}`, 10, y += 10);
+  doc.text(`Disk Perforation: ${diskPerforation}`, 10, y += 10);
 
-      doc.setFontSize(12);
-      doc.text(`Patient Name: ${name}`, 10, 20);
-      doc.text(`Age: ${age}`, 10, 30);
-      doc.text(`Gender: ${gender}`, 10, 40);
-      doc.text(`Date of Exam: ${date}`, 10, 50);
-      doc.text(`Evaluation Time Point: ${timepoints}`, 10, 60);
+  // Results
+  const clinicalResult = document.getElementById('clinicalResult').innerText;
+  const radiologicResult = document.getElementById('radiologicResult').innerText;
+  const surgicalResult = document.getElementById('surgicalResult').innerText;
+  doc.text(``, 10, y += 10);
+  doc.text(clinicalResult, 10, y += 10);
+  doc.text(radiologicResult, 10, y += 10);
+  doc.text(surgicalResult, 10, y += 10);
 
-      doc.text(clinicalResult, 10, 80);
-      doc.text(radiologicResult, 10, 90);
-      doc.text(surgicalResult, 10, 100);
-
-      doc.save(`${name || 'Wilkes_Staging'}_Result.pdf`);
-    }
+  doc.save(`${name || 'Wilkes_Staging'}_Result.pdf`);
+}
+    
   </script>
 </body>
 </html>
