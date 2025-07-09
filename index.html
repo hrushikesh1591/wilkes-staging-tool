@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wilkes Staging Tool</title>
+  <!-- Link to external CSS file -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Link to jsPDF library (can be hosted locally or via CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <h2>Wilkes Staging Tool - TMJ Internal Derangement</h2>
+  <form id="wilkesForm" onsubmit="event.preventDefault(); evaluateStages();">
+    <div class="section">
+      <h3>Patient Information</h3>
+      <div class="question"><label>Patient Name:<input type="text" name="patientName" required /></label></div>
+      <div class="question"><label>Age:<input type="text" name="age" required /></label></div>
+      <div class="question"><label>Gender:<input type="text" name="gender" required /></label></div>
+      <div class="question"><label>Date of Exam:<input type="date" name="examDate" required /></label></div>
+      <div class="question">
+        <label>Evaluation Time Point:</label>
+        <div class="radio-option">
+          <label><input type="radio" name="evaluationTimepointRadio" value="Preop" onclick="toggleOtherTimepoint(false)" /> Preop</label>
+        </div>
+        <div class="radio-option">
+          <label><input type="radio" name="evaluationTimepointRadio" value="POD 7" onclick="toggleOtherTimepoint(false)" /> POD 7</label>
+        </div>
+        <div class="radio-option">
+          <label><input type="radio" name="evaluationTimepointRadio" value="PO 1 Month" onclick="toggleOtherTimepoint(false)" /> PO 1 Month</label>
+        </div>
+        <div class="radio-option">
+          <label><input type="radio" name="evaluationTimepointRadio" value="PO 3 Months" onclick="toggleOtherTimepoint(false)" /> PO 3 Months</label>
+        </div>
+        <div class="radio-option">
+          <label><input type="radio" name="evaluationTimepointRadio" value="Other" id="otherTimepointRadio" onclick="toggleOtherTimepoint(true)" /> Other:</label>
+          <input type="text" name="otherTimepointText" id="otherTimepointText" disabled />
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>Clinical Findings</h3>
+      <div class="question">
+        <label><input type="checkbox" name="reciprocalClick" /> Presence of Reciprocal Clicking</label>
+      </div>
+      <div class="question">
+        <label>Clicking Timing:</label>
+        <select name="clickingTiming">
+          <option value="">Select</option>
+          <option value="early">Early opening movement</option>
+          <option value="late">Late closing movement</option>
+          <option value="later">Later in opening movement</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Clicking Intensity:</label>
+        <select name="clickingIntensity">
+          <option value="">Select</option>
+          <option value="soft">Soft</option>
+          <option value="increased">Increased</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Pain Presence:</label>
+        <select name="painPresence">
+          <option value="">Select</option>
+          <option value="none">No pain</option>
+          <option value="few">First few episodes of pain</option>
+          <option value="multiple">Multiple episodes</option>
+          <option value="chronic">Chronic/episodic pain</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Limitation of Motion:</label>
+        <select name="limitationMotion">
+          <option value="">Select</option>
+          <option value="none">No limitation</option>
+          <option value="restriction">Restriction</option>
+          <option value="variable">Variable restriction</option>
+          <option value="chronic">Chronic restriction</option>
+        </select>
+      </div>
+      <div class="question">
+        <label><input type="checkbox" name="crepitus" /> Crepitus on Examination</label>
+      </div>
+    </div>
+    <div class="section">
+      <h3>Radiologic Findings</h3>
+      <div class="question">
+        <label>Disk Displacement:</label>
+        <select name="diskDisplacement">
+          <option value="">Select</option>
+          <option value="slightForward">Slight forward displacement</option>
+          <option value="anterior">Anterior displacement</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Disk Morphology:</label>
+        <select name="diskMorphology">
+          <option value="">Select</option>
+          <option value="good">Good anatomical contour</option>
+          <option value="moderate">Moderate to marked thickening</option>
+          <option value="significant">Significant deformity</option>
+          <option value="gross">Gross anatomical deformity</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Hard-Tissue Changes:</label>
+        <select name="hardTissueChanges">
+          <option value="">Select</option>
+          <option value="early">Early to moderate degenerative</option>
+          <option value="advanced">Degenerative arthritic changes</option>
+        </select>
+      </div>
+    </div>
+    <div class="section">
+      <h3>Surgical Findings</h3>
+      <div class="question">
+        <label>Disk Form (Surgical):</label>
+        <select name="diskSurgicalForm">
+          <option value="">Select</option>
+          <option value="normal">Normal</option>
+          <option value="marked">Marked deformity</option>
+          <option value="gross">Gross degenerative changes</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Adhesions:</label>
+        <select name="adhesions">
+          <option value="">Select</option>
+          <option value="multiple">Multiple</option>
+          <option value="degenerative">Degenerative equivalent</option>
+        </select>
+      </div>
+      <div class="question">
+        <label><input type="checkbox" name="osteophytes" /> Osteophytic Projections</label>
+      </div>
+      <div class="question">
+        <label>Disk Perforation:</label>
+        <select name="diskPerforation">
+          <option value="">Select</option>
+          <option value="none">No perforation</option>
+          <option value="present">Present</option>
+        </select>
+      </div>
+    </div>
+    <div class="section">
+      <button type="submit">Evaluate Wilkes Stage</button>
+      <button type="button" onclick="evaluateStages(); downloadPDF();">Download Result as PDF</button>
+    </div>
+  </form>
+  <div class="section" id="results">
+    <h3 id="clinicalResult">Clinical Staging: </h3>
+    <h3 id="radiologicResult">Radiologic Staging: </h3>
+    <h3 id="surgicalResult">Surgical Staging: </h3>
+  </div>
+  <footer>
+    <p>Developed by Dr. Hrushikesh Gosai</p>
+    <p>Version 1.2 | Last Updated: 2/7/25</p>
+  </footer>
+  <!-- Link to external JavaScript file -->
+  <script src="script.js"></script>
+</body>
+</html>
