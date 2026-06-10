@@ -1,12 +1,11 @@
-// script.js
+// script.js - WILKES STAGING TOOL WITH GOOGLE SHEETS SAVING
 
-// Function to enable/disable the "Other" text input based on radio button selection
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3mDwieZwFfwcvAwPs7yCBHJ6TXTSdeQpll7lOKc8pQT0K6SZQtWeFVv8H47dcwunTyw/exec';
+
 function toggleOtherTimepoint(enable) {
   const otherTimepointText = document.getElementById('otherTimepointText');
   otherTimepointText.disabled = !enable;
-  if (!enable) {
-    otherTimepointText.value = ''; // Clear text if "Other" is deselected
-  }
+  if (!enable) otherTimepointText.value = '';
 }
 
 function evaluateStages() {
@@ -53,12 +52,7 @@ function evaluateStages() {
       surgicalStage = 'Wilkes Stage I or II';
     } else if (surgicalForm === 'marked' || adhesions === 'multiple') {
       surgicalStage = 'Wilkes Stage III or IV';
-    } else if (
-      surgicalForm === 'gross' ||
-      diskPerforation === 'present' ||
-      osteophytes ||
-      adhesions === 'degenerative'
-    ) {
+    } else if (surgicalForm === 'gross' || diskPerforation === 'present' || osteophytes || adhesions === 'degenerative') {
       surgicalStage = 'Wilkes Stage V';
     }
   }
@@ -66,45 +60,124 @@ function evaluateStages() {
   document.getElementById('clinicalResult').innerText = 'Clinical Staging: ' + (clinicalStage || 'Insufficient data');
   document.getElementById('radiologicResult').innerText = 'Radiologic Staging: ' + (radiologicStage || 'Insufficient data');
   document.getElementById('surgicalResult').innerText = 'Surgical Staging: ' + (surgicalStage || 'Insufficient data');
+
+  // Store results for saving
+  window._wilkesResults = { clinicalStage, radiologicStage, surgicalStage };
+}
+
+async function saveToSheets() {
+  const form = document.forms['wilkesForm'];
+  if (!form) { showCustomMessageBox('Form not found.'); return; }
+
+  // Run evaluation first to ensure results are up to date
+  evaluateStages();
+
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+
+  try {
+    // Get evaluation timepoint
+    let evalTime = '';
+    const radios = form['evaluationTimepointRadio'];
+    if (radios) {
+      for (const r of radios) {
+        if (r.checked) {
+          evalTime = r.value;
+          if (evalTime === 'Other') {
+            evalTime = 'Other: ' + (form['otherTimepointText']?.value || '');
+          }
+          break;
+        }
+      }
+    }
+
+    const results = window._wilkesResults || {};
+
+    const payload = {
+      type: 'Wilkes',
+      patientName: form['patientName']?.value || '',
+      age: form['age']?.value || '',
+      gender: form['gender']?.value || '',
+      examDate: form['examDate']?.value || '',
+      evalTime: evalTime,
+      reciprocalClick: form['reciprocalClick']?.checked ? 'Yes' : 'No',
+      clickingTiming: form['clickingTiming']?.value || '',
+      clickingIntensity: form['clickingIntensity']?.value || '',
+      painPresence: form['painPresence']?.value || '',
+      limitationMotion: form['limitationMotion']?.value || '',
+      crepitus: form['crepitus']?.checked ? 'Yes' : 'No',
+      diskDisplacement: form['diskDisplacement']?.value || '',
+      diskMorphology: form['diskMorphology']?.value || '',
+      hardTissueChanges: form['hardTissueChanges']?.value || '',
+      diskSurgicalForm: form['diskSurgicalForm']?.value || '',
+      adhesions: form['adhesions']?.value || '',
+      osteophytes: form['osteophytes']?.checked ? 'Yes' : 'No',
+      diskPerforation: form['diskPerforation']?.value || '',
+      clinicalStage: results.clinicalStage || '',
+      radiologicStage: results.radiologicStage || '',
+      surgicalStage: results.surgicalStage || ''
+    };
+
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (result.status === 'success') {
+      showCustomMessageBox('\u2705 Data saved to Google Sheets successfully!');
+    } else {
+      showCustomMessageBox('\u274c Error: ' + (result.message || 'Unknown error'));
+    }
+  } catch (err) {
+    console.error('Save error:', err);
+    showCustomMessageBox('\u274c Failed to save. Check your internet connection.');
+  } finally {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save to Google Sheets'; }
+  }
+}
+
+function showCustomMessageBox(message) {
+  const existing = document.querySelector('.message-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'message-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;padding:20px;border-radius:8px;max-width:90%;width:420px;box-shadow:0 8px 30px rgba(0,0,0,0.2);font-family:sans-serif;color:#111;';
+  const p = document.createElement('p');
+  p.textContent = message;
+  p.style.cssText = 'margin-bottom:18px;font-size:1rem;line-height:1.4;';
+  const btn = document.createElement('button');
+  btn.textContent = 'OK';
+  btn.style.cssText = 'padding:10px 18px;background:#1d4ed8;color:#fff;border:none;border-radius:6px;cursor:pointer;';
+  btn.addEventListener('click', () => overlay.remove());
+  box.appendChild(p); box.appendChild(btn);
+  overlay.appendChild(box); document.body.appendChild(overlay);
 }
 
 function downloadPDF() {
   if (!(window.jspdf && window.jspdf.jsPDF)) {
-    // Use a custom message box instead of alert()
-    const messageBox = document.createElement('div');
-    messageBox.style.cssText = `
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background-color: white; padding: 20px; border: 1px solid #ccc;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1); z-index: 1000; border-radius: 8px;
-      text-align: center;
-    `;
-    messageBox.innerHTML = `
-      <p>jsPDF not loaded. Please check your internet connection.</p>
-      <button onclick="this.parentNode.remove()">OK</button>
-    `;
-    document.body.appendChild(messageBox);
+    showCustomMessageBox('jsPDF not loaded. Please check your internet connection.');
     return;
   }
   const doc = new window.jspdf.jsPDF();
   const form = document.forms['wilkesForm'];
   let y = 20;
 
-  // Patient Information
   const name = form['patientName']?.value || '';
   const age = form['age']?.value || '';
   const gender = form['gender']?.value || '';
   const date = form['examDate']?.value || '';
 
-  // Get selected timepoint for radio buttons
-  const selectedTimepointRadio = form['evaluationTimepointRadio'];
   let timepointValue = '';
+  const selectedTimepointRadio = form['evaluationTimepointRadio'];
   if (selectedTimepointRadio) {
     for (const radio of selectedTimepointRadio) {
       if (radio.checked) {
         timepointValue = radio.value;
         if (timepointValue === 'Other') {
-          const otherText = form['otherTimepointText']?.value;
-          timepointValue = `Other: ${otherText || '(not specified)'}`;
+          timepointValue = `Other: ${form['otherTimepointText']?.value || '(not specified)'}`;
         }
         break;
       }
@@ -112,59 +185,39 @@ function downloadPDF() {
   }
 
   doc.setFontSize(12);
-  doc.text(`Patient Information:`, 10, y);
+  doc.text('Patient Information:', 10, y);
   doc.text(`Name: ${name}`, 10, y += 10);
   doc.text(`Age: ${age}`, 10, y += 10);
   doc.text(`Gender: ${gender}`, 10, y += 10);
   doc.text(`Date of Exam: ${date}`, 10, y += 10);
   doc.text(`Evaluation Time Point: ${timepointValue || 'Not Selected'}`, 10, y += 10);
 
-  // Clinical Findings
-  const reciprocalClick = form['reciprocalClick']?.checked ? 'Yes' : 'No';
-  const clickingTiming = form['clickingTiming']?.value || '';
-  const clickingIntensity = form['clickingIntensity']?.value || '';
-  const painPresence = form['painPresence']?.value || '';
-  const limitationMotion = form['limitationMotion']?.value || '';
-  const crepitus = form['crepitus']?.checked ? 'Yes' : 'No';
-  doc.text(``, 10, y += 10);
-  doc.text(`Clinical Findings:`, 10, y += 10);
-  doc.text(`Reciprocal Click: ${reciprocalClick}`, 10, y += 10);
-  doc.text(`Clicking Timing: ${clickingTiming}`, 10, y += 10);
-  doc.text(`Clicking Intensity: ${clickingIntensity}`, 10, y += 10);
-  doc.text(`Pain Presence: ${painPresence}`, 10, y += 10);
-  doc.text(`Limitation of Motion: ${limitationMotion}`, 10, y += 10);
-  doc.text(`Crepitus: ${crepitus}`, 10, y += 10);
+  doc.text('', 10, y += 10);
+  doc.text('Clinical Findings:', 10, y += 10);
+  doc.text(`Reciprocal Click: ${form['reciprocalClick']?.checked ? 'Yes' : 'No'}`, 10, y += 10);
+  doc.text(`Clicking Timing: ${form['clickingTiming']?.value || ''}`, 10, y += 10);
+  doc.text(`Clicking Intensity: ${form['clickingIntensity']?.value || ''}`, 10, y += 10);
+  doc.text(`Pain Presence: ${form['painPresence']?.value || ''}`, 10, y += 10);
+  doc.text(`Limitation of Motion: ${form['limitationMotion']?.value || ''}`, 10, y += 10);
+  doc.text(`Crepitus: ${form['crepitus']?.checked ? 'Yes' : 'No'}`, 10, y += 10);
 
-  // Radiologic Findings
-  const diskDisplacement = form['diskDisplacement']?.value || '';
-  const diskMorphology = form['diskMorphology']?.value || '';
-  const hardTissueChanges = form['hardTissueChanges']?.value || '';
-  doc.text(``, 10, y += 10);
-  doc.text(`Radiologic Findings:`, 10, y += 10);
-  doc.text(`Disk Displacement: ${diskDisplacement}`, 10, y += 10);
-  doc.text(`Disk Morphology: ${diskMorphology}`, 10, y += 10);
-  doc.text(`Hard-Tissue Changes: ${hardTissueChanges}`, 10, y += 10);
+  doc.text('', 10, y += 10);
+  doc.text('Radiologic Findings:', 10, y += 10);
+  doc.text(`Disk Displacement: ${form['diskDisplacement']?.value || ''}`, 10, y += 10);
+  doc.text(`Disk Morphology: ${form['diskMorphology']?.value || ''}`, 10, y += 10);
+  doc.text(`Hard-Tissue Changes: ${form['hardTissueChanges']?.value || ''}`, 10, y += 10);
 
-  // Surgical Findings
-  const diskSurgicalForm = form['diskSurgicalForm']?.value || '';
-  const adhesions = form['adhesions']?.value || '';
-  const osteophytes = form['osteophytes']?.checked ? 'Yes' : 'No';
-  const diskPerforation = form['diskPerforation']?.value || '';
-  doc.text(``, 10, y += 10);
-  doc.text(`Surgical Findings:`, 10, y += 10);
-  doc.text(`Disk Form (Surgical): ${diskSurgicalForm}`, 10, y += 10);
-  doc.text(`Adhesions: ${adhesions}`, 10, y += 10);
-  doc.text(`Osteophytic Projections: ${osteophytes}`, 10, y += 10);
-  doc.text(`Disk Perforation: ${diskPerforation}`, 10, y += 10);
+  doc.text('', 10, y += 10);
+  doc.text('Surgical Findings:', 10, y += 10);
+  doc.text(`Disk Form: ${form['diskSurgicalForm']?.value || ''}`, 10, y += 10);
+  doc.text(`Adhesions: ${form['adhesions']?.value || ''}`, 10, y += 10);
+  doc.text(`Osteophytic Projections: ${form['osteophytes']?.checked ? 'Yes' : 'No'}`, 10, y += 10);
+  doc.text(`Disk Perforation: ${form['diskPerforation']?.value || ''}`, 10, y += 10);
 
-  // Results
-  const clinicalResult = document.getElementById('clinicalResult').innerText;
-  const radiologicResult = document.getElementById('radiologicResult').innerText;
-  const surgicalResult = document.getElementById('surgicalResult').innerText;
-  doc.text(``, 10, y += 10);
-  doc.text(clinicalResult, 10, y += 10);
-  doc.text(radiologicResult, 10, y += 10);
-  doc.text(surgicalResult, 10, y += 10);
+  doc.text('', 10, y += 10);
+  doc.text(document.getElementById('clinicalResult').innerText, 10, y += 10);
+  doc.text(document.getElementById('radiologicResult').innerText, 10, y += 10);
+  doc.text(document.getElementById('surgicalResult').innerText, 10, y += 10);
 
   doc.save(`${name || 'Wilkes_Staging'}_Result.pdf`);
 }
